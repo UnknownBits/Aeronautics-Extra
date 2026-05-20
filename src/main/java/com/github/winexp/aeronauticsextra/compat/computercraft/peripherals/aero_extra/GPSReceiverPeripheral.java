@@ -3,6 +3,7 @@ package com.github.winexp.aeronauticsextra.compat.computercraft.peripherals.aero
 import com.github.winexp.aeronauticsextra.content.blocks.geomatics.gps.receiver.GPSReceiverBlockEntity;
 import dan200.computercraft.api.lua.LuaFunction;
 import dev.simulated_team.simulated.compat.computercraft.peripherals.SimPeripheral;
+import net.minecraft.core.Vec3i;
 import net.minecraft.world.phys.Vec3;
 
 import java.util.List;
@@ -31,13 +32,14 @@ public class GPSReceiverPeripheral extends SimPeripheral<GPSReceiverBlockEntity>
     }
 
     @LuaFunction
-    public final int getMaxDistance() {
-        return this.blockEntity.getMaxDistance();
+    public final List<Integer> getMaxDistance() {
+        Vec3i maxDistance = this.blockEntity.getMaxDistance();
+        return List.of(maxDistance.getX(), maxDistance.getY(), maxDistance.getZ());
     }
 
     @LuaFunction
-    public final void setMaxDistance(int distance) {
-        this.blockEntity.setMaxDistance(distance);
+    public final void setMaxDistance(int x, int y, int z) {
+        this.blockEntity.setMaxDistance(new Vec3i(x, y, z));
     }
 
     @LuaFunction

@@ -9,6 +9,7 @@ import com.simibubi.create.foundation.gui.menu.AbstractSimiContainerScreen;
 import net.createmod.catnip.platform.CatnipServices;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.EditBox;
+import net.minecraft.core.Vec3i;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.phys.Vec3;
@@ -18,7 +19,9 @@ public class GPSReceiverConfigScreen extends AbstractSimiContainerScreen<Receive
     private DoubleEditBox xEditBox;
     private DoubleEditBox yEditBox;
     private DoubleEditBox zEditBox;
-    private IntegerEditBox maxDistanceEditBox;
+    private IntegerEditBox xMaxDistanceEditBox;
+    private IntegerEditBox yMaxDistanceEditBox;
+    private IntegerEditBox zMaxDistanceEditBox;
 
     public GPSReceiverConfigScreen(ReceiverConfigMenu menu, Inventory inventory, Component title) {
         super(menu, inventory, title);
@@ -27,7 +30,7 @@ public class GPSReceiverConfigScreen extends AbstractSimiContainerScreen<Receive
 
     private boolean canSave() {
         return this.xEditBox.isValidInput() && this.yEditBox.isValidInput() && this.zEditBox.isValidInput()
-                && this.maxDistanceEditBox.isValidInput();
+                && this.xMaxDistanceEditBox.isValidInput() && this.yMaxDistanceEditBox.isValidInput() && this.zMaxDistanceEditBox.isValidInput();
     }
 
     private void save() {
@@ -37,7 +40,11 @@ public class GPSReceiverConfigScreen extends AbstractSimiContainerScreen<Receive
                     this.yEditBox.getBoxValue(),
                     this.zEditBox.getBoxValue()
             );
-            int maxDistance = this.maxDistanceEditBox.getBoxValue();
+            Vec3i maxDistance = new Vec3i(
+                    this.xMaxDistanceEditBox.getBoxValue(),
+                    this.yMaxDistanceEditBox.getBoxValue(),
+                    this.zMaxDistanceEditBox.getBoxValue()
+            );
             CatnipServices.NETWORK.sendToServer(new ServerBoundReceiverConfigRequest(this.menu.contentHolder.getBlockPos(), targetPos, maxDistance));
         }
     }
@@ -64,10 +71,20 @@ public class GPSReceiverConfigScreen extends AbstractSimiContainerScreen<Receive
                 this.yEditBox, this.menu.contentHolder.getTargetPos().y));
         this.zEditBox = this.addRenderableWidget(this.createPositionEditBox((this.width + 60) / 2, (this.height - 60) / 2, 40, 20,
                 this.zEditBox, this.menu.contentHolder.getTargetPos().z));
-        this.maxDistanceEditBox = this.addRenderableWidget(new IntegerEditBox((this.width - 40) / 2, (this.height + 20) / 2, 40, 20,
-                this.maxDistanceEditBox, Component.empty()));
-        this.maxDistanceEditBox.range = GPSReceiverBlockEntity.MAX_DISTANCE_RANGE;
-        this.maxDistanceEditBox.setBoxValue(this.menu.contentHolder.getMaxDistance());
+
+        Vec3i maxDistance = this.menu.contentHolder.getMaxDistance();
+        this.xMaxDistanceEditBox = this.addRenderableWidget(new IntegerEditBox((this.width - 140) / 2, (this.height + 20) / 2, 40, 20,
+                this.xMaxDistanceEditBox, Component.empty()));
+        this.xMaxDistanceEditBox.range = GPSReceiverBlockEntity.MAX_DISTANCE_RANGE;
+        this.xMaxDistanceEditBox.setBoxValue(maxDistance.getX());
+        this.yMaxDistanceEditBox = this.addRenderableWidget(new IntegerEditBox((this.width - 40) / 2, (this.height + 20) / 2, 40, 20,
+                this.yMaxDistanceEditBox, Component.empty()));
+        this.yMaxDistanceEditBox.range = GPSReceiverBlockEntity.MAX_DISTANCE_RANGE;
+        this.yMaxDistanceEditBox.setBoxValue(maxDistance.getY());
+        this.zMaxDistanceEditBox = this.addRenderableWidget(new IntegerEditBox((this.width + 60) / 2, (this.height + 20) / 2, 40, 20,
+                this.zMaxDistanceEditBox, Component.empty()));
+        this.zMaxDistanceEditBox.range = GPSReceiverBlockEntity.MAX_DISTANCE_RANGE;
+        this.zMaxDistanceEditBox.setBoxValue(maxDistance.getZ());
     }
 
     @Override

@@ -4,6 +4,7 @@ import com.github.winexp.aeronauticsextra.AeronauticsExtra;
 import com.github.winexp.aeronauticsextra.content.blocks.geomatics.gps.receiver.GPSReceiverBlockEntity;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Vec3i;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
@@ -14,7 +15,7 @@ import net.minecraft.world.phys.Vec3;
 import net.neoforged.neoforge.network.handling.IPayloadContext;
 import net.neoforged.neoforge.network.handling.IPayloadHandler;
 
-public record ServerBoundReceiverConfigRequest(BlockPos blockPos, Vec3 targetPos, int maxDistance) implements CustomPacketPayload {
+public record ServerBoundReceiverConfigRequest(BlockPos blockPos, Vec3 targetPos, Vec3i maxDistance) implements CustomPacketPayload {
     public static final Type<ServerBoundReceiverConfigRequest> TYPE = new Type<>(ResourceLocation.fromNamespaceAndPath(AeronauticsExtra.MOD_ID, "gps_receiver_config"));
 
     public static final StreamCodec<ByteBuf, ServerBoundReceiverConfigRequest> STREAM_CODEC = StreamCodec.composite(
@@ -22,7 +23,7 @@ public record ServerBoundReceiverConfigRequest(BlockPos blockPos, Vec3 targetPos
             ServerBoundReceiverConfigRequest::blockPos,
             ByteBufCodecs.fromCodec(Vec3.CODEC),
             ServerBoundReceiverConfigRequest::targetPos,
-            ByteBufCodecs.VAR_INT,
+            ByteBufCodecs.fromCodec(Vec3i.CODEC),
             ServerBoundReceiverConfigRequest::maxDistance,
             ServerBoundReceiverConfigRequest::new
     );

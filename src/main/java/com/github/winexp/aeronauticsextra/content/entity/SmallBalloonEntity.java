@@ -164,7 +164,8 @@ public class SmallBalloonEntity extends LivingEntity implements Leashable, Entit
 
     @Override
     public void travel(Vec3 travelVector) {
-        this.setDeltaMovement(this.getDeltaMovement().multiply(0.87, 0.91, 0.87));
+        double verticalFactor = this.getDeltaMovement().y >= 0 ? 0.9 : 0.86;
+        this.setDeltaMovement(this.getDeltaMovement().multiply(0.87, verticalFactor, 0.87));
         super.travel(travelVector);
     }
 
@@ -176,8 +177,7 @@ public class SmallBalloonEntity extends LivingEntity implements Leashable, Entit
         this.yawRate += (deltaRotY * horizontalSpeed * 0.2f - this.yawRate) * horizontalSpeed * 0.15f;
         this.setYRot(Mth.wrapDegrees(this.getYRot() + this.yawRate));
         this.prevMotionYaw = motionYaw;
-        if (!this.level().isClientSide) {
-        } else {
+        if (this.level().isClientSide) {
             this.prevRotation.set(this.rotation);
             Vec3 axis = motion.multiply(1, 0, 1).cross(new Vec3(0, 1, 0)).normalize();
 

@@ -17,6 +17,7 @@ import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.HolderLookup;
+import net.minecraft.core.Vec3i;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.MenuProvider;
@@ -40,7 +41,7 @@ public class GPSReceiverBlockEntity extends SmartBlockEntity implements IHaveGog
     @Nullable
     private Vec3 currentPos;
     private Vec3 targetPos = Vec3.ZERO;
-    private int maxDistance = 64;
+    private Vec3i maxDistance = new Vec3i(64, 64, 64);
 
     private final Map<Direction, Integer> signalMap = new EnumMap<>(Direction.class) {
         {
@@ -49,6 +50,7 @@ public class GPSReceiverBlockEntity extends SmartBlockEntity implements IHaveGog
             }
         }
     };
+    private boolean sampling = false;
     private boolean updated = false;
     private final ArrayList<GPSSampleData> sampleDataList =  new ArrayList<>();
     private int sendDataCounter;
@@ -72,12 +74,17 @@ public class GPSReceiverBlockEntity extends SmartBlockEntity implements IHaveGog
         this.notifyUpdate();
     }
 
-    public int getMaxDistance() {
+    public Vec3i getMaxDistance() {
         return this.maxDistance;
     }
 
-    public void setMaxDistance(int maxDistance) {
-        this.maxDistance = MAX_DISTANCE_RANGE.fit(maxDistance);
+    public void setMaxDistance(Vec3i maxDistance) {
+        maxDistance = new Vec3i(
+                MAX_DISTANCE_RANGE.fit(maxDistance.getX()),
+                MAX_DISTANCE_RANGE.fit(maxDistance.getY()),
+                MAX_DISTANCE_RANGE.fit(maxDistance.getZ())
+        );
+        this.maxDistance = maxDistance;
         this.notifyUpdate();
     }
 
@@ -104,37 +111,41 @@ public class GPSReceiverBlockEntity extends SmartBlockEntity implements IHaveGog
     }
 
     public void updateSignal(BlockState state) {
-        if (this.currentPos == null) return;
-
-        Direction front = state.getValue(GPSReceiverBlock.FACING);
-        Vec3 targetPos = this.targetPos;
-        Vec3 currentPos = this.currentPos;
-        double dx = targetPos.x - currentPos.x;
-        double dy = targetPos.y - currentPos.y;
-        double dz = targetPos.z - currentPos.z;
-        int signalX = (int) Math.floor(dx / this.maxDistance * 15);
-        int signalY = (int) Math.floor(dy / this.maxDistance * 15);
-        int signalZ = (int) Math.floor(dz / this.maxDistance * 15);
-        if (signalX > 0) {
-            this.signalMap.put(front.getCounterClockWise(), 0);
-            this.signalMap.put(front.getClockWise(), signalX);
+        if (this.currentPos == null) {
+            for (Direction direction : Direction.values()) {
+                this.signalMap.put(direction, 0);
+            }
         } else {
-            this.signalMap.put(front.getCounterClockWise(), -signalX);
-            this.signalMap.put(front.getClockWise(), 0);
-        }
-        if (signalY > 0) {
-            this.signalMap.put(Direction.DOWN, 0);
-            this.signalMap.put(Direction.UP, signalY);
-        } else {
-            this.signalMap.put(Direction.DOWN, -signalY);
-            this.signalMap.put(Direction.UP, 0);
-        }
-        if (signalZ > 0) {
-            this.signalMap.put(front, 0);
-            this.signalMap.put(front.getOpposite(), signalZ);
-        } else {
-            this.signalMap.put(front, -signalZ);
-            this.signalMap.put(front.getOpposite(), 0);
+            Direction front = state.getValue(GPSReceiverBlock.FACING);
+            Vec3 targetPos = this.targetPos;
+            Vec3 currentPos = this.currentPos;
+            double dx = targetPos.x - currentPos.x;
+            double dy = targetPos.y - currentPos.y;
+            double dz = targetPos.z - currentPos.z;
+            int signalX = this.maxDistance.getX() == 0 ? 0 : (int) (dx / this.maxDistance.getX() * 15);
+            int signalY = this.maxDistance.getY() == 0 ? 0 : (int) (dy / this.maxDistance.getY() * 15);
+            int signalZ = this.maxDistance.getZ() == 0 ? 0 : (int) (dz / this.maxDistance.getZ() * 15);
+            if (signalX > 0) {
+                this.signalMap.put(front.getCounterClockWise(), 0);
+                this.signalMap.put(front.getClockWise(), signalX);
+            } else {
+                this.signalMap.put(front.getCounterClockWise(), -signalX);
+                this.signalMap.put(front.getClockWise(), 0);
+            }
+            if (signalY > 0) {
+                this.signalMap.put(Direction.DOWN, 0);
+                this.signalMap.put(Direction.UP, signalY);
+            } else {
+                this.signalMap.put(Direction.DOWN, -signalY);
+                this.signalMap.put(Direction.UP, 0);
+            }
+            if (signalZ > 0) {
+                this.signalMap.put(front, 0);
+                this.signalMap.put(front.getOpposite(), signalZ);
+            } else {
+                this.signalMap.put(front, -signalZ);
+                this.signalMap.put(front.getOpposite(), 0);
+            }
         }
 
         Level level = this.getLevel();
@@ -157,7 +168,14 @@ public class GPSReceiverBlockEntity extends SmartBlockEntity implements IHaveGog
                 targetPosTag.getDouble("y"),
                 targetPosTag.getDouble("z")
         );
-        this.maxDistance = tag.getInt("max_distance");
+
+        CompoundTag maxDistanceTag = tag.getCompound("max_distance");
+        this.maxDistance = new Vec3i(
+                maxDistanceTag.getInt("x"),
+                maxDistanceTag.getInt("y"),
+                maxDistanceTag.getInt("z")
+        );
+
         CompoundTag currentPosTag = tag.getCompound("current_pos");
         if (!currentPosTag.isEmpty()) {
             this.currentPos = new Vec3(
@@ -181,7 +199,13 @@ public class GPSReceiverBlockEntity extends SmartBlockEntity implements IHaveGog
         targetPosTag.putDouble("y", this.targetPos.y);
         targetPosTag.putDouble("z", this.targetPos.z);
         tag.put("target_pos", targetPosTag);
-        tag.putInt("max_distance", this.maxDistance);
+
+        CompoundTag maxDistanceTag = new CompoundTag();
+        maxDistanceTag.putInt("x", this.maxDistance.getX());
+        maxDistanceTag.putInt("y", this.maxDistance.getY());
+        maxDistanceTag.putInt("z", this.maxDistance.getZ());
+        tag.put("max_distance", maxDistanceTag);
+
         if (this.currentPos != null) {
             CompoundTag currentPosTag = new CompoundTag();
             currentPosTag.putDouble("x", this.currentPos.x);
@@ -209,12 +233,15 @@ public class GPSReceiverBlockEntity extends SmartBlockEntity implements IHaveGog
     public void lazyTick() {
         super.lazyTick();
         if (!this.level.isClientSide) {
-            BlockPos blockPos = this.getBlockPos();
-            BlockState blockState = this.level.getBlockState(blockPos);
-            Vec3 pos = Sable.HELPER.projectOutOfSubLevel(this.level, blockPos.getCenter());
-            Vec3 antennaPos = Sable.HELPER.projectOutOfSubLevel(this.level, GPSReceiverBlock.getAntennaTopPos(this.level, blockState, blockPos));
-            GPSBroadcastReceiver receiver = new GPSBroadcastReceiver(this.level, pos, antennaPos, 0.07f, this::receiveBroadcast, this::onSamplingComplete, this.scrollValueBehaviour.value);
-            GPSManager.registerReceiver(receiver);
+            if (!this.sampling) {
+                BlockPos blockPos = this.getBlockPos();
+                BlockState blockState = this.level.getBlockState(blockPos);
+                Vec3 pos = Sable.HELPER.projectOutOfSubLevel(this.level, blockPos.getCenter());
+                Vec3 antennaPos = Sable.HELPER.projectOutOfSubLevel(this.level, GPSReceiverBlock.getAntennaTopPos(this.level, blockState, blockPos));
+                GPSBroadcastReceiver receiver = new GPSBroadcastReceiver(this.level, pos, antennaPos, 0.07f, this::receiveBroadcast, this::onSamplingComplete, this.scrollValueBehaviour.value);
+                GPSManager.registerReceiver(receiver);
+                this.sampling = true;
+            }
         }
     }
 
@@ -223,6 +250,7 @@ public class GPSReceiverBlockEntity extends SmartBlockEntity implements IHaveGog
     }
 
     private void onSamplingComplete() {
+        this.sampling = false;
         if (this.isRemoved()) return;
         TrilaterationResolver.LocateResult result = TrilaterationResolver.locate(this.sampleDataList);
         if (!result.isEmpty()) {
