@@ -4,7 +4,7 @@ import com.github.winexp.aeronauticsextra.client.gui.widgets.DoubleEditBox;
 import com.github.winexp.aeronauticsextra.client.gui.widgets.IntegerEditBox;
 import com.github.winexp.aeronauticsextra.content.blocks.geomatics.gps.receiver.GPSReceiverBlockEntity;
 import com.github.winexp.aeronauticsextra.content.logistics.gps.gui.ReceiverConfigMenu;
-import com.github.winexp.aeronauticsextra.content.logistics.gps.networking.ServerBoundReceiverConfigRequest;
+import com.github.winexp.aeronauticsextra.content.logistics.gps.network.ServerBoundReceiverConfigRequest;
 import com.simibubi.create.foundation.gui.menu.AbstractSimiContainerScreen;
 import net.createmod.catnip.platform.CatnipServices;
 import net.minecraft.client.gui.GuiGraphics;

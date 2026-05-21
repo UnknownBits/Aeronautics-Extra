@@ -1,0 +1,6 @@
+{
+  "parent": "minecraft:item/generated",
+  "textures": {
+    "layer0": "aeronauticsextra:item/creative_gravity_staff"
+  }
+}

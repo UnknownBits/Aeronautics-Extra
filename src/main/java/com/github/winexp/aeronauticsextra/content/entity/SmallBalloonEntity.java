@@ -4,6 +4,7 @@ import com.github.winexp.aeronauticsextra.content.entity.physics.EntitySubLevelA
 import com.github.winexp.aeronauticsextra.registry.AeroExtraEntityTypes;
 import dev.ryanhcode.sable.Sable;
 import dev.ryanhcode.sable.api.physics.force.ForceGroups;
+import dev.ryanhcode.sable.api.physics.force.ForceTotal;
 import dev.ryanhcode.sable.api.physics.force.QueuedForceGroup;
 import dev.ryanhcode.sable.api.physics.handle.RigidBodyHandle;
 import dev.ryanhcode.sable.companion.math.JOMLConversion;
@@ -33,6 +34,7 @@ import org.jspecify.annotations.Nullable;
 
 import java.util.List;
 
+//TODO: BlockEntity
 public class SmallBalloonEntity extends LivingEntity implements Leashable, EntitySubLevelActor {
     public static final double MAX_ENTITY_LIFT = 0.2;
     public static final double LEASH_LENGTH = 4;
@@ -45,6 +47,7 @@ public class SmallBalloonEntity extends LivingEntity implements Leashable, Entit
     private float yawRate;
     private final AxisAngle4f rotation = new AxisAngle4f();
     private final AxisAngle4f prevRotation = new AxisAngle4f();
+    private final ForceTotal forceTotal = new ForceTotal();
 
     public SmallBalloonEntity(EntityType<SmallBalloonEntity> entityType, Level level) {
         super(entityType, level);
@@ -147,19 +150,21 @@ public class SmallBalloonEntity extends LivingEntity implements Leashable, Entit
 
     @Override
     public void subLevelPhysicsTick(ServerSubLevel subLevel, RigidBodyHandle handle, double timeStep) {
-        if (this.getLeashHolder() instanceof LeashFenceKnotEntity entity && Sable.HELPER.getContaining(entity) == subLevel) {
+        if (!this.isRemoved() && this.getLeashHolder() instanceof LeashFenceKnotEntity entity && Sable.HELPER.getContaining(entity) == subLevel) {
             float distance = this.distanceTo(entity);
             Vec3 holderPos = Sable.HELPER.projectOutOfSubLevel(entity.level(), entity.position());
             if (distance > LEASH_LENGTH && this.getY() > holderPos.y) {
                 Vector3d direction = JOMLConversion.toJOML(this.position().subtract(holderPos).normalize());
                 Vector3d forcePoint = JOMLConversion.atCenterOf(entity.blockPosition());
-                Vector3d lift = subLevel.logicalPose().transformNormalInverse(new Vector3d(0, 0.7, 0).mul(direction));
+                Vector3d lift = subLevel.logicalPose().transformNormalInverse(new Vector3d(0, 27, 0).mul(timeStep).mul(direction));
                 double airPressure = DimensionPhysicsData.getAirPressure(entity.level(), JOMLConversion.toJOML(holderPos));
                 lift.mul(airPressure);
                 QueuedForceGroup queuedForceGroup = subLevel.getOrCreateQueuedForceGroup(ForceGroups.BALLOON_LIFT.get());
-                queuedForceGroup.applyAndRecordPointForce(forcePoint, lift);
+                queuedForceGroup.recordPointForce(forcePoint, lift);
+                this.forceTotal.applyImpulseAtPoint(subLevel, forcePoint, lift);
             }
         }
+        handle.applyForcesAndReset(this.forceTotal);
     }
 
     @Override
@@ -212,8 +217,8 @@ public class SmallBalloonEntity extends LivingEntity implements Leashable, Entit
         if (this.getLeashHolder() != null)  {
             this.liftEntity(this.getLeashHolder());
         }
-        if (this.isAlive() && !this.level().isClientSide) {
-            if (this.position().y > this.level().getMaxBuildHeight() + 64) {
+        if (!this.level().isClientSide) {
+            if (this.isAlive() && this.position().y > this.level().getMaxBuildHeight() + 64) {
                 this.hurt(this.damageSources().outOfBorder(), 1);
             }
         }

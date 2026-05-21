@@ -1,4 +1,4 @@
-package com.github.winexp.aeronauticsextra.mixin_interface.create;
+package com.github.winexp.aeronauticsextra.mixin_interface;
 
 import net.minecraft.core.Direction;
 import net.minecraft.world.level.block.state.BlockState;

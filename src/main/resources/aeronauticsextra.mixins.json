@@ -3,14 +3,13 @@
   "package": "com.github.winexp.aeronauticsextra.mixin",
   "compatibilityLevel": "JAVA_21",
   "mixins": [
+    "CogwheelPlacementExtensionMixin",
     "ComputerCraftPeripheralsMixin",
-    "aeronautics.HotAirBurnerBlockEntityMixin",
-    "aeronautics.SteamVentBlockEntityMixin",
-    "create.CogwheelPlacementExtensionMixin",
-    "sable.ServerSubLevelMixin",
-    "simulated.GimbalSensorBlockEntityMixin",
-    "simulated.GimbalSensorDisplaySourceMixin",
-    "simulated.GimbalSensorPeripheralMixin"
+    "accessor.HotAirBurnerBlockEntityMixin",
+    "accessor.SteamVentBlockEntityMixin",
+    "accessor.WheelMountBlockEntityMixin",
+    "entity_physics.ServerSubLevelMixin",
+    "gravity_staff.ServerSubLevelMixin"
   ],
   "mixinextras": {
     "minVersion": "0.5.3"

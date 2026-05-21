@@ -2,7 +2,7 @@ package com.github.winexp.aeronauticsextra.client.gui;
 
 import com.github.winexp.aeronauticsextra.client.gui.widgets.DoubleEditBox;
 import com.github.winexp.aeronauticsextra.content.logistics.gps.gui.SatelliteConfigMenu;
-import com.github.winexp.aeronauticsextra.content.logistics.gps.networking.ServerBoundSatelliteConfigRequest;
+import com.github.winexp.aeronauticsextra.content.logistics.gps.network.ServerBoundSatelliteConfigRequest;
 import com.simibubi.create.foundation.gui.menu.AbstractSimiContainerScreen;
 import net.createmod.catnip.platform.CatnipServices;
 import net.minecraft.client.gui.GuiGraphics;

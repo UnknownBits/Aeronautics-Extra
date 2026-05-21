@@ -1,6 +1,6 @@
-package com.github.winexp.aeronauticsextra.mixin.create;
+package com.github.winexp.aeronauticsextra.mixin;
 
-import com.github.winexp.aeronauticsextra.mixin_interface.create.CogwheelPlacementExtensionExt;
+import com.github.winexp.aeronauticsextra.mixin_interface.CogwheelPlacementExtensionExt;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import com.llamalad7.mixinextras.sugar.Share;

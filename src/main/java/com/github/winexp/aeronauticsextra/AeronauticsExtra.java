@@ -1,5 +1,6 @@
 package com.github.winexp.aeronauticsextra;
 
+import com.github.winexp.aeronauticsextra.network.AeroExtraPackets;
 import com.github.winexp.aeronauticsextra.registry.*;
 import com.mojang.logging.LogUtils;
 import com.simibubi.create.foundation.item.ItemDescription;
@@ -33,6 +34,7 @@ public class AeronauticsExtra {
         AeroExtraItems.register();
         AeroExtraEntityTypes.register();
         AeroExtraMenuTypes.register();
+        AeroExtraPackets.init();
 
         AeroExtraDisplaySources.register();
     }

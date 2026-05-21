@@ -1,13 +1,13 @@
-package com.github.winexp.aeronauticsextra.mixin.aeronautics;
+package com.github.winexp.aeronauticsextra.mixin.accessor;
 
-import com.github.winexp.aeronauticsextra.mixin_interface.aeronautics.HotAirBurnerBlockEntityExtension;
+import com.github.winexp.aeronauticsextra.mixin_interface.accessor.HotAirBurnerAccessor;
 import com.simibubi.create.foundation.blockEntity.behaviour.scrollValue.ScrollValueBehaviour;
 import dev.eriksonn.aeronautics.content.blocks.hot_air.steam_vent.SteamVentBlockEntity;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 
 @Mixin(SteamVentBlockEntity.class)
-public class SteamVentBlockEntityMixin implements HotAirBurnerBlockEntityExtension {
+public class SteamVentBlockEntityMixin implements HotAirBurnerAccessor {
     @Shadow
     protected ScrollValueBehaviour steamAmountBehaviour;
 

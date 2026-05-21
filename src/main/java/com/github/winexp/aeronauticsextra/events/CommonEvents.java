@@ -4,8 +4,6 @@ import com.github.winexp.aeronauticsextra.AeronauticsExtra;
 import com.github.winexp.aeronauticsextra.content.commands.GPSCommand;
 import com.github.winexp.aeronauticsextra.content.commands.RaycastCommand;
 import com.github.winexp.aeronauticsextra.content.logistics.gps.GPSManager;
-import com.github.winexp.aeronauticsextra.content.logistics.gps.networking.ServerBoundReceiverConfigRequest;
-import com.github.winexp.aeronauticsextra.content.logistics.gps.networking.ServerBoundSatelliteConfigRequest;
 import com.mojang.brigadier.arguments.IntegerArgumentType;
 import net.minecraft.commands.Commands;
 import net.minecraft.commands.arguments.coordinates.Vec3Argument;
@@ -15,20 +13,9 @@ import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.event.RegisterCommandsEvent;
 import net.neoforged.neoforge.event.server.ServerStartedEvent;
 import net.neoforged.neoforge.event.tick.ServerTickEvent;
-import net.neoforged.neoforge.network.event.RegisterPayloadHandlersEvent;
-import net.neoforged.neoforge.network.registration.PayloadRegistrar;
 
 @EventBusSubscriber(modid = AeronauticsExtra.MOD_ID)
 public class CommonEvents {
-    @SubscribeEvent
-    public static void onPayloadRegister(RegisterPayloadHandlersEvent event) {
-        PayloadRegistrar registrar = event.registrar("1");
-        registrar.playToServer(ServerBoundSatelliteConfigRequest.TYPE, ServerBoundSatelliteConfigRequest.STREAM_CODEC, new ServerBoundSatelliteConfigRequest.RequestHandler());
-        registrar.playToServer(ServerBoundReceiverConfigRequest.TYPE, ServerBoundReceiverConfigRequest.STREAM_CODEC, new ServerBoundReceiverConfigRequest.RequestHandler());
-    }
-
-
-
     @SubscribeEvent
     public static void onServerStarted(ServerStartedEvent event) {
         GPSManager.init();

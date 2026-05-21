@@ -1,7 +1,8 @@
-package com.github.winexp.aeronauticsextra.content.logistics.gps.networking;
+package com.github.winexp.aeronauticsextra.content.logistics.gps.network;
 
 import com.github.winexp.aeronauticsextra.AeronauticsExtra;
 import com.github.winexp.aeronauticsextra.content.blocks.geomatics.gps.receiver.GPSReceiverBlockEntity;
+import foundry.veil.api.network.handler.PacketContext;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Vec3i;
@@ -12,8 +13,6 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.neoforge.network.handling.IPayloadContext;
-import net.neoforged.neoforge.network.handling.IPayloadHandler;
 
 public record ServerBoundReceiverConfigRequest(BlockPos blockPos, Vec3 targetPos, Vec3i maxDistance) implements CustomPacketPayload {
     public static final Type<ServerBoundReceiverConfigRequest> TYPE = new Type<>(ResourceLocation.fromNamespaceAndPath(AeronauticsExtra.MOD_ID, "gps_receiver_config"));
@@ -33,17 +32,14 @@ public record ServerBoundReceiverConfigRequest(BlockPos blockPos, Vec3 targetPos
         return TYPE;
     }
 
-    public static class RequestHandler implements IPayloadHandler<ServerBoundReceiverConfigRequest> {
-        @Override
-        public void handle(ServerBoundReceiverConfigRequest request, IPayloadContext context) {
-            Player player = context.player();
-            Level level = player.level();
-            BlockPos blockPos = request.blockPos();
-            if (!level.isLoaded(blockPos)) return;
-            if (level.getBlockEntity(blockPos) instanceof GPSReceiverBlockEntity receiver && receiver.canPlayerUse(player)) {
-                receiver.setTargetPos(request.targetPos);
-                receiver.setMaxDistance(request.maxDistance);
-            }
+    public void handle(PacketContext context) {
+        Player player = context.player();
+        Level level = player.level();
+        BlockPos blockPos = this.blockPos;
+        if (!level.isLoaded(blockPos)) return;
+        if (level.getBlockEntity(blockPos) instanceof GPSReceiverBlockEntity receiver && receiver.canPlayerUse(player)) {
+            receiver.setTargetPos(this.targetPos);
+            receiver.setMaxDistance(this.maxDistance);
         }
     }
 }

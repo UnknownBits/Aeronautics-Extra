@@ -1,4 +1,4 @@
-package com.github.winexp.aeronauticsextra.mixin.sable;
+package com.github.winexp.aeronauticsextra.mixin.entity_physics;
 
 import com.github.winexp.aeronauticsextra.content.entity.physics.EntitySubLevelActor;
 import dev.ryanhcode.sable.api.physics.handle.RigidBodyHandle;

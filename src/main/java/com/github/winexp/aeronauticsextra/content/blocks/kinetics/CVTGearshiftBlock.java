@@ -1,6 +1,6 @@
 package com.github.winexp.aeronauticsextra.content.blocks.kinetics;
 
-import com.github.winexp.aeronauticsextra.mixin_interface.create.CogwheelPlacementExtensionExt;
+import com.github.winexp.aeronauticsextra.mixin_interface.CogwheelPlacementExtensionExt;
 import com.github.winexp.aeronauticsextra.registry.AeroExtraBlockEntityTypes;
 import com.github.winexp.aeronauticsextra.registry.AeroExtraBlocks;
 import com.mojang.serialization.MapCodec;

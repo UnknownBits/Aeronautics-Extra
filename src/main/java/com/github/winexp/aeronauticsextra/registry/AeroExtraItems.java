@@ -1,6 +1,7 @@
 package com.github.winexp.aeronauticsextra.registry;
 
 import com.github.winexp.aeronauticsextra.AeronauticsExtra;
+import com.github.winexp.aeronauticsextra.content.item.GravityStaffItem;
 import com.github.winexp.aeronauticsextra.content.item.SmallBalloonItem;
 import com.simibubi.create.foundation.data.CreateRegistrate;
 import com.tterrag.registrate.builders.ItemBuilder;
@@ -32,6 +33,11 @@ public class AeroExtraItems {
     public static final ItemEntry<SmallBalloonItem> SMALL_BALLOON = builder(AeroExtraCreativeTabs.AERONAUTICS_EXTRA, "small_balloon", SmallBalloonItem::new)
             .properties(p -> p
                     .component(DataComponents.BASE_COLOR, DyeColor.WHITE))
+            .register();
+
+    public static final ItemEntry<GravityStaffItem> GRAVITY_STAFF = builder(AeroExtraCreativeTabs.SIMULATED_EXTRA, "creative_gravity_staff", GravityStaffItem::new)
+            .properties(p -> p
+                    .stacksTo(1))
             .register();
 
     private static <T extends Item> ItemBuilder<T, CreateRegistrate> builder(ResourceLocation section, String id, NonNullFunction<Item.Properties, T> factory) {
