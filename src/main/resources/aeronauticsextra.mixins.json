@@ -4,7 +4,6 @@
   "compatibilityLevel": "JAVA_21",
   "mixins": [
     "CogwheelPlacementExtensionMixin",
-    "ComputerCraftPeripheralsMixin",
     "accessor.HotAirBurnerBlockEntityMixin",
     "accessor.SteamVentBlockEntityMixin",
     "accessor.WheelMountBlockEntityMixin",

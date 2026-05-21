@@ -9,10 +9,14 @@ import com.github.winexp.aeronauticsextra.compat.computercraft.peripherals.offro
 import com.github.winexp.aeronauticsextra.registry.AeroExtraBlockEntityTypes;
 import dev.eriksonn.aeronautics.index.AeroBlockEntityTypes;
 import dev.ryanhcode.offroad.index.OffroadBlockEntityTypes;
+import dev.simulated_team.simulated.service.ServiceUtil;
+import dev.simulated_team.simulated.service.SimModCompatibilityService;
 import dev.simulated_team.simulated.service.compat.SimPeripheralService;
 
-public class AeroExtraPeripherals {
-    public static void init(SimPeripheralService service) {
+public class ComputerCraftPeripherals implements SimModCompatibilityService {
+    @Override
+    public void init() {
+        SimPeripheralService service = ServiceUtil.load(SimPeripheralService.class);
         AeronauticsExtra.LOGGER.info("Loading Simulated peripherals...");
         service.addPeripheral(AeroBlockEntityTypes.HOT_AIR_BURNER, HotAirBurnerPeripheral::new);
         service.addPeripheral(AeroBlockEntityTypes.STEAM_VENT, SteamVentPeripheral::new);
@@ -21,5 +25,10 @@ public class AeroExtraPeripherals {
         AeronauticsExtra.LOGGER.info("Loading Aeronautics Extra peripherals...");
         service.addPeripheral(AeroExtraBlockEntityTypes.GPS_RECEIVER, GPSReceiverPeripheral::new);
         service.addPeripheral(AeroExtraBlockEntityTypes.CVT_GEARSHIFT, CVTGearshiftPeripheral::new);
+    }
+
+    @Override
+    public String getModId() {
+        return "computercraft";
     }
 }
